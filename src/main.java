@@ -26,16 +26,18 @@ public class Sequence {
     private String[] holder;
     private int items; //the number of items in the holder
     private int currentIndex;
+    private final int NO_INDEX = -1;
 
     /**
      * Creates a new sequence with initial capacity 10.
      */
     public Sequence() {
          this.holder = new String[DEFAULT_SIZE];
-         this.currentIndex = -1;
+         this.currentIndex = NO_INDEX;
          this.items = 0;
     }
 
+    //make new array, copy all elements to array, then set this.holder = new array
 
     /**
      * Creates a new sequence. (non-default constructor)
@@ -44,7 +46,7 @@ public class Sequence {
      */
     public Sequence(int initialCapacity){
         this.holder = new String[initialCapacity];
-        this.currentIndex = -1;
+        this.currentIndex = NO_INDEX;
         this.items = 0;
     }
 
@@ -79,15 +81,7 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addAfter(String value) {
-        if(this.currentIndex < this.holder.length-2){ //if the current index is the second last index (includes if there is no current index, in which currIndex = -1)
-            this.currentIndex += 1; //added element becomes current element
-            this.holder[currentIndex] = value; //add the value after the previous current element
-        }
-        else if(this.currentIndex == this.holder.length -1){ //if the current index is at the end of the capacity
-            int newCapacity = getCapacity()*2; //getting capacity of old holder and doubling it.  will be used for new holder capacity
-            //make copy of old one, then make new one.
-            this.holder = new holder(newCapacity+1);//this.holder is made into a new holder double its capacity +1
-        }
+
     }
 
 
@@ -95,7 +89,7 @@ public class Sequence {
      * @return true if and only if the sequence has a current element.
      */
     public boolean isCurrent() {
-        return this.currentIndex > 0 && this.currentIndex < this.holder.length; //double check this
+        return this.currentIndex > NO_INDEX; //double check this
     }
 
 
@@ -130,9 +124,13 @@ public class Sequence {
      * should now have.
      */
     public void ensureCapacity(int minCapacity) {
-
-        if(this.holder.length < minCapacity){
-            //still need to understand how increasing the capacity is done
+        //make new array, copy all elements to array, then set this.holder = new array
+        if(this.getCapacity() < minCapacity){
+            String[] newHolder = new String[minCapacity];
+            for(int i = 0; i < this.getCapacity(); i++){ //check the i< condition is correct
+                newHolder[i] = this.holder[i];
+            }
+            this.holder = newHolder;
         }
     }
 
@@ -153,10 +151,33 @@ public class Sequence {
      * @param another the sequence whose contents should be added.
      */
     public void addAll(Sequence another) {
-
-        //still need to know how to increase capacity by changing the instance variable
+        if(another.items <= this.remainingCapacity()){
+            this.addItems(another);
+            }
+        else if(another.items > this.remainingCapacity()){
+            int minCapacity = this.size() + another.size();
+            this.ensureCapacity(minCapacity);
+            this.addItems(another);
+        }
     }
 
+    /**
+     * adds items from another Sequence to this sequence.
+     * @param another
+     */
+    private void addItems(Sequence another){
+        for(int i=0; i < another.items; i++) { //for all items that are to be added
+            this.addAfter(another.holder[i]);  //double check implementation of this helper
+        }
+    }
+
+    /**
+     * gets the remaining capacity in a Sequence.
+     * @return the number of remaining spaces in the Sequence.
+     */
+    private int remainingCapacity(){
+        return this.getCapacity() - this.items;
+    }
 
     /**
      * Move forward in the sequence so that the current element is now
@@ -168,6 +189,9 @@ public class Sequence {
      * If there is no current element to begin with, do nothing.
      */
     public void advance() {
+        if(this.currentIndex == this.getCapacity()-1){ // if the current index is at the end of the sequence
+            this.currentIndex = NO_INDEX;  //is this.getCapacity()-1 the best way to express "at the last index"
+        }
         this.currentIndex +=1;
     }
 
@@ -210,7 +234,7 @@ public class Sequence {
      * @return the number of elements stored in the sequence.
      */
     public int size() {
-        return this.currentIndex+1; //this is kind of jank, double check this is legal
+        return this.items;
     }
 
 
@@ -220,7 +244,7 @@ public class Sequence {
      */
     public void start() {
         if(size() == 0){
-            this.currentIndex = -1;
+            this.currentIndex = NO_INDEX;
         }
         else{
             this.currentIndex = 0;
@@ -233,10 +257,19 @@ public class Sequence {
      * capacity to store only the elements currently stored.
      */
     public void trimToSize() {
-        if(this.holder.length-1 > this.currentIndex){
-            this.holder = new String[this.currentIndex +1]; //ask about setting this, might f it up because creating new instance variable
+        if(getCapacity() > this.items){
+            String[] newHolder = new String[this.items];
+            for(int i = 0; i < this.getCapacity() ; i++){
+
+            }
             //have to use clone method?
-            //copy contents of the old sequence to new sequence
+            //copy contents of the old sequence to new sequence, a for loop has to be used to add all elements
+
+
+                //if capacity...
+                //create new array to size of items
+                //add all old elements to new array
+                //set equal to new array
         }
     }
 
@@ -284,15 +317,16 @@ public class Sequence {
      * @return true if Sequence empty, else false
      */
     public boolean isEmpty() {
-
+        return this.items == 0;
     }
 
 
     /**
      *  empty the sequence.  There should be no current element.
      */
-    public void clear()
-    {
+    public void clear() {
+        this.items = 0;
+        this.currentIndex = NO_INDEX;
     }
 
 }
