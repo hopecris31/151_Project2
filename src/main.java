@@ -1,11 +1,18 @@
 /**
+ * CS 151 Project 2
+ * Oct 4, 2022
+ *
  *  A class that represents a sequence ADT.
- *  Oct 4, 2022
+ *
  *  INVARIANTS:
  *  If size>0:
  *      The contents are stored in sequence at indexes 0 through size-1
  *      If there's no current index, current = -1
- *      the contents at Indexes >= size are irrelevant
+ *      the contents at Indexes >= items are irrelevant
+ *      if size - 0, the items are irrelevant
+ *  if 0 <= size <= holder.length
+ *      currentIndex can never be greater than size
+ *
  *
  *  INSTANCE VARIABLES:
  *      holder -- the String array that holds the items
@@ -17,7 +24,7 @@ public class Sequence {
 
     private final int DEFAULT_SIZE = 10;
     private String[] holder;
-    private int items;
+    private int items; //the number of items in the holder
     private int currentIndex;
 
     /**
@@ -36,10 +43,9 @@ public class Sequence {
      * @param initialCapacity the initial capacity of the sequence.
      */
     public Sequence(int initialCapacity){
-        // REMOVE THIS:
-        //
-        // capacity is reflected in the length of the
-        // internal array
+        this.holder = new String[initialCapacity];
+        this.currentIndex = -1;
+        this.items = 0;
     }
 
 
@@ -72,24 +78,32 @@ public class Sequence {
      *
      * @param value the string to add.
      */
-    public void addAfter(String value)
-    {
+    public void addAfter(String value) {
+        if(this.currentIndex < this.holder.length-2){ //if the current index is the second last index (includes if there is no current index, in which currIndex = -1)
+            this.currentIndex += 1; //added element becomes current element
+            this.holder[currentIndex] = value; //add the value after the previous current element
+        }
+        else if(this.currentIndex == this.holder.length -1){ //if the current index is at the end of the capacity
+            int newCapacity = getCapacity()*2; //getting capacity of old holder and doubling it.  will be used for new holder capacity
+            //make copy of old one, then make new one.
+            this.holder = new holder(newCapacity+1);//this.holder is made into a new holder double its capacity +1
+        }
     }
 
 
     /**
      * @return true if and only if the sequence has a current element.
      */
-    public boolean isCurrent()
-    {
+    public boolean isCurrent() {
+        return this.currentIndex > 0 && this.currentIndex < this.holder.length; //double check this
     }
 
 
     /**
      * @return the capacity of the sequence.
      */
-    public int getCapacity()
-    {
+    public int getCapacity() {
+        return this.holder.length;
     }
 
 
@@ -97,8 +111,13 @@ public class Sequence {
      * @return the element at the current location in the sequence, or
      * null if there is no current element.
      */
-    public String getCurrent()
-    {
+    public String getCurrent() {
+        if (isCurrent()){
+            return this.holder[this.currentIndex];
+        }
+        else{
+            return null;
+        }
     }
 
 
@@ -110,8 +129,11 @@ public class Sequence {
      * @param minCapacity the minimum capacity that the sequence
      * should now have.
      */
-    public void ensureCapacity(int minCapacity)
-    {
+    public void ensureCapacity(int minCapacity) {
+
+        if(this.holder.length < minCapacity){
+            //still need to understand how increasing the capacity is done
+        }
     }
 
 
@@ -130,8 +152,9 @@ public class Sequence {
      *
      * @param another the sequence whose contents should be added.
      */
-    public void addAll(Sequence another)
-    {
+    public void addAll(Sequence another) {
+
+        //still need to know how to increase capacity by changing the instance variable
     }
 
 
@@ -144,8 +167,8 @@ public class Sequence {
      *
      * If there is no current element to begin with, do nothing.
      */
-    public void advance()
-    {
+    public void advance() {
+        this.currentIndex +=1;
     }
 
 
@@ -159,8 +182,14 @@ public class Sequence {
      *
      * @return the copy of this sequence.
      */
-    public Sequence clone()
-    {
+    public Sequence clone() {
+        Sequence newSequence = new Sequence(this.getCapacity());
+        newSequence.currentIndex = this.currentIndex;  //double check these, pointers may be invalid
+        newSequence.items = this.items;
+        for (int i =0; i < this.getCapacity(); i++){
+            newSequence.holder[i] = this.holder[i];
+        }
+        return newSequence;
     }
 
 
@@ -172,16 +201,16 @@ public class Sequence {
      *
      * If there is no current element, does nothing.
      */
-    public void removeCurrent()
-    {
+    public void removeCurrent() {
+
     }
 
 
     /**
      * @return the number of elements stored in the sequence.
      */
-    public int size()
-    {
+    public int size() {
+        return this.currentIndex+1; //this is kind of jank, double check this is legal
     }
 
 
@@ -189,8 +218,13 @@ public class Sequence {
      * Sets the current element to the start of the sequence.  If the
      * sequence is empty, the sequence has no current element.
      */
-    public void start()
-    {
+    public void start() {
+        if(size() == 0){
+            this.currentIndex = -1;
+        }
+        else{
+            this.currentIndex = 0;
+        }
     }
 
 
@@ -198,8 +232,12 @@ public class Sequence {
      * Reduce the current capacity to its actual size, so that it has
      * capacity to store only the elements currently stored.
      */
-    public void trimToSize()
-    {
+    public void trimToSize() {
+        if(this.holder.length-1 > this.currentIndex){
+            this.holder = new String[this.currentIndex +1]; //ask about setting this, might f it up because creating new instance variable
+            //have to use clone method?
+            //copy contents of the old sequence to new sequence
+        }
     }
 
 
@@ -218,8 +256,8 @@ public class Sequence {
      *
      * @return a string representation of this sequence.
      */
-    public String toString()
-    {
+    public String toString() {
+
     }
 
     /**
@@ -236,8 +274,8 @@ public class Sequence {
      * @param other the other Sequence with which to compare
      * @return true iff the other sequence is equal to this one.
      */
-    public boolean equals(Sequence other)
-    {
+    public boolean equals(Sequence other) {
+
     }
 
 
@@ -245,8 +283,8 @@ public class Sequence {
      *
      * @return true if Sequence empty, else false
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
+
     }
 
 
