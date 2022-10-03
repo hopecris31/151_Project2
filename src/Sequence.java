@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 /**
  * CS 151 Project 2
  * Oct 4, 2022
@@ -416,6 +414,7 @@ public class Sequence {
             }
             sequenceString += current;
         }
+        sequenceString += "(capacity = " + this.getCapacity() + ")";
         return sequenceString;
     }
 
