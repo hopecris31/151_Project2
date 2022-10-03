@@ -83,21 +83,33 @@ public class Sequence {
      *
      * @param value the string to add.
      */
-    public void addAfter(String value) {
+    public void addAfter(String value) { // make switch cases
         if(endOfSequenceReached()){ // is it okay to directly "access" an instance variable like this?
             int doubleCapacity = this.getCapacity()*2;
             this.ensureCapacity(doubleCapacity+1);
+            this.shiftAndAdd(value);
         }
         if(!isCurrent()){ //if there is no current index
-            this.holder[this.getLastIndex()] = value; //set last index to value
+            this.setIndexValue(this.getLastIndex(), value); //set last index to value
             this.setCurrentIndex(getLastIndex());
         }
+        else{
+            this.shiftAndAdd(value);
+        }
+    }
+
+    /**
+     * shifts all elements over one to the right
+     * adds a value in the holder after currentIndex
+     * sets currentIndex to the value just added
+     * @param value a value to be added
+     */
+    private void shiftAndAdd(String value){
         for(int i=this.size()-1; i>this.currentIndex; i--){
             this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
-        this.setIndex(this.currentIndex+1, value); //setting the index after current index to value to be added
+        this.setIndexValue(this.currentIndex+1, value); //setting the index after current index to value to be added
         this.advance(); //move currentIndex up one
-
     }
 
     /**
@@ -109,11 +121,11 @@ public class Sequence {
     }
 
     /**
-     *
+     *Sets a value to a specified index
      * @param index index to be set
      * @param value value to take place of the index
      */
-    private void setIndex(int index, String value){
+    private void setIndexValue(int index, String value){
         this.holder[index] = value;
     }
 
@@ -121,7 +133,7 @@ public class Sequence {
      * @return true if and only if the sequence has a current element.
      */
     public boolean isCurrent() {
-        return this.currentIndex > NO_INDEX; //double check this
+        return this.currentIndex != NO_INDEX; //double check this
     }
 
 
@@ -176,7 +188,7 @@ public class Sequence {
         if(this.getCapacity() < minCapacity){
             String[] newHolder = new String[minCapacity];
             for(int i = 0; i < this.getCapacity(); i++){ //check the i< condition is correct
-                newHolder[i] = this.holder[i];
+                newHolder[i] = this.holder[i]; // use helper method to set index??
             }
             this.holder = newHolder;
         }
@@ -373,6 +385,9 @@ public class Sequence {
      *  empty the sequence.  There should be no current element.
      */
     public void clear() {
+        for(int i=0; i < this.size(); i++){
+            this.holder[i] = null; //check this
+        }
         this.items = 0;
         this.currentIndex = NO_INDEX;
     }
