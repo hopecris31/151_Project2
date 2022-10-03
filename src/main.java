@@ -63,9 +63,20 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addBefore(String value) {
-        if(this.currentIndex == getLastIndex()){ // is it okay to directly "access" an instance variable like this?
+        if(this.endOfSequenceReached()){
             int doubleCapacity = this.getCapacity()*2;
             this.ensureCapacity(doubleCapacity+1);
+        }
+    }
+
+    /**
+     * shifts all elements from currentIndex and after one to the right
+     * adds a value in the holder in the spot of currentIndex, before previous currentIndex
+     * @param value
+     */
+    private void shiftIncludingCurrent(String value){
+        for(int i=this.size()-1; i>=this.currentIndex; i--){
+            this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
     }
 
@@ -83,28 +94,28 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addAfter(String value) { // should I make this into a switch case
-        if(endOfSequenceReached()){ // is it okay to directly "access" an instance variable like this?
+        if(this.endOfSequenceReached()){
             int doubleCapacity = this.getCapacity()*2;
             this.ensureCapacity(doubleCapacity+1);
-            this.shiftAndAdd(value);
+            this.shiftExcludingCurrent(value);
         }
-        if(!isCurrent()){ //if there is no current index
+        if(!this.isCurrent()){ //if there is no current index
             this.setIndexValue(this.getLastIndex(), value); //set last index to value
             this.setCurrentIndex(getLastIndex());
         }
         else{
-            this.shiftAndAdd(value);
+            this.shiftExcludingCurrent(value);
         }
     }
 
     /**
-     * shifts all elements over one to the right
+     * shifts all elements after currentIndex over one to the right
      * adds a value in the holder after currentIndex
      * sets currentIndex to the value just added
      * @param value a value to be added
      */
-    private void shiftAndAdd(String value){
-        for(int i=this.size()-1; i>=this.currentIndex; i--){
+    private void shiftExcludingCurrent(String value){
+        for(int i=this.size()-1; i>this.currentIndex; i--){
             this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
         this.setIndexValue(this.currentIndex+1, value); //setting the index after current index to value to be added
@@ -295,7 +306,7 @@ public class Sequence {
      * If there is no current element, does nothing.
      */
     public void removeCurrent() {
-        if(this.isCurrent()){
+        if(this.isCurrent()){ //as remove() shifts elements down, the next element automatically becomes current without having to set it
             this.remove();
             if(this.endOfSequenceReached()){
                 this.setCurrentIndex(NO_INDEX);
@@ -326,8 +337,8 @@ public class Sequence {
      * sequence is empty, the sequence has no current element.
      */
     public void start() {
-        if(size() == 0){
-            this.currentIndex = NO_INDEX;
+        if(this.isEmpty()){
+            this.setCurrentIndex(NO_INDEX);
         }
         else{
             this.advance(); //here should i use advance method or set = 0
@@ -400,7 +411,7 @@ public class Sequence {
      * @return true if Sequence empty, else false
      */
     public boolean isEmpty() {
-        return this.items == 0;
+        return this.size() > 0;
     }
 
 
