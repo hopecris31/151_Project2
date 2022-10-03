@@ -21,7 +21,6 @@
  */
 
 public class Sequence {
-
     private final int DEFAULT_SIZE = 10;
     private String[] holder;
     private int items; //the number of items in the holder
@@ -64,6 +63,10 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addBefore(String value) {
+        if(this.currentIndex == getLastIndex()){ // is it okay to directly "access" an instance variable like this?
+            int doubleCapacity = this.getCapacity()*2;
+            this.ensureCapacity(doubleCapacity+1);
+        }
 
     }
 
@@ -81,9 +84,38 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addAfter(String value) {
+        if(endOfSequenceReached()){ // is it okay to directly "access" an instance variable like this?
+            int doubleCapacity = this.getCapacity()*2;
+            this.ensureCapacity(doubleCapacity+1);
+        }
+        if(!isCurrent()){ //if there is no current index
+            this.holder[this.getLastIndex()] = value; //set last index to value
+            this.setCurrentIndex(getLastIndex());
+        }
+        for(int i=this.size()-1; i>this.currentIndex; i--){
+            this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
+        }
+        this.setIndex(this.currentIndex+1, value); //setting the index after current index to value to be added
+        this.advance(); //move currentIndex up one
 
     }
 
+    /**
+     * sets the current index to the index specified
+     * @param newIndex a new current index
+     */
+    private void setCurrentIndex (int newIndex){
+        this.currentIndex = newIndex;
+    }
+
+    /**
+     *
+     * @param index index to be set
+     * @param value value to take place of the index
+     */
+    private void setIndex(int index, String value){
+        this.holder[index] = value;
+    }
 
     /**
      * @return true if and only if the sequence has a current element.
@@ -98,6 +130,22 @@ public class Sequence {
      */
     public int getCapacity() {
         return this.holder.length;
+    }
+
+    /**
+     * gets the last index in a seqence
+     * @return the last index of a sequence
+     */
+    private int getLastIndex(){
+        return getCapacity()-1;
+    }
+
+    /**
+     *
+     * @return True if the end of the sequence has been reached, False if not
+     */
+    private boolean endOfSequenceReached(){
+        return this.currentIndex == getLastIndex();
     }
 
 
@@ -163,7 +211,7 @@ public class Sequence {
 
     /**
      * adds items from another Sequence to this sequence.
-     * @param another
+     * @param another the other sequence to be added to original
      */
     private void addItems(Sequence another){
         for(int i=0; i < another.items; i++) { //for all items that are to be added
@@ -189,7 +237,7 @@ public class Sequence {
      * If there is no current element to begin with, do nothing.
      */
     public void advance() {
-        if(this.currentIndex == this.getCapacity()-1){ // if the current index is at the end of the sequence
+        if(this.currentIndex == this.getLastIndex()){ // if the current index is at the end of the sequence
             this.currentIndex = NO_INDEX;  //is this.getCapacity()-1 the best way to express "at the last index"
         }
         this.currentIndex +=1;
@@ -247,7 +295,7 @@ public class Sequence {
             this.currentIndex = NO_INDEX;
         }
         else{
-            this.currentIndex = 0;
+            this.advance(); //here should i use advance method or set = 0
         }
     }
 
