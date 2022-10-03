@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 /**
  * CS 151 Project 2
  * Oct 4, 2022
@@ -64,9 +66,24 @@ public class Sequence {
      */
     public void addBefore(String value) {
         if(this.endOfSequenceReached()){
-            int doubleCapacity = this.getCapacity()*2;
-            this.ensureCapacity(doubleCapacity+1);
+            doubleCapacity();
+            this.shiftIncludingCurrent(value);
         }
+        else if(!this.isCurrent()){ //if currentIndex == -1
+            this.advance(); //the current index becomes 0
+            this.setIndexValue(this.currentIndex, value); //the value is set to the currentIndex
+        }
+        else{
+            this.shiftIncludingCurrent(value);
+        }
+    }
+
+    /**
+     * increases the capacity of a sequence by expanding to twice its current capacity plus 1.
+     */
+    private void doubleCapacity(){
+        int doubleCapacity = this.getCapacity()*2;
+        this.ensureCapacity(doubleCapacity+1);
     }
 
     /**
@@ -75,9 +92,10 @@ public class Sequence {
      * @param value
      */
     private void shiftIncludingCurrent(String value){
-        for(int i=this.size()-1; i>=this.currentIndex; i--){
+        for(int i = this.size()-1; i >= this.currentIndex; i--){
             this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
+        this.setIndexValue(this.currentIndex, value);
     }
 
 
@@ -95,11 +113,10 @@ public class Sequence {
      */
     public void addAfter(String value) { // should I make this into a switch case
         if(this.endOfSequenceReached()){
-            int doubleCapacity = this.getCapacity()*2;
-            this.ensureCapacity(doubleCapacity+1);
+            doubleCapacity();
             this.shiftExcludingCurrent(value);
         }
-        if(!this.isCurrent()){ //if there is no current index
+        else if(!this.isCurrent()){ //if there is no current index
             this.setIndexValue(this.getLastIndex(), value); //set last index to value
             this.setCurrentIndex(getLastIndex());
         }
@@ -115,11 +132,11 @@ public class Sequence {
      * @param value a value to be added
      */
     private void shiftExcludingCurrent(String value){
-        for(int i=this.size()-1; i>this.currentIndex; i--){
+        for(int i = this.size()-1; i > this.currentIndex; i--){
             this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
-        this.setIndexValue(this.currentIndex+1, value); //setting the index after current index to value to be added
-        this.advance(); //move currentIndex up one
+        this.advance();
+        this.setIndexValue(this.currentIndex, value); //setting the current index to value to be added
     }
 
     /**
@@ -137,6 +154,13 @@ public class Sequence {
      */
     private void setIndexValue(int index, String value){
         this.holder[index] = value;
+    }
+
+    /**
+     * sets the number of items in the sequence to 0
+     */
+    private void clearItems(){
+        this.items = 0;
     }
 
     /**
@@ -245,7 +269,7 @@ public class Sequence {
      * @param another the other sequence to be added to original
      */
     private void addItems(Sequence another){
-        for(int i=0; i < another.items; i++) { //for all items that are to be added
+        for(int i = 0; i < another.items; i++) { //for all items that are to be added
             this.addAfter(another.holder[i]);  //double check implementation of this helper
         }
     }
@@ -290,7 +314,7 @@ public class Sequence {
         Sequence newSequence = new Sequence(this.getCapacity());
         newSequence.currentIndex = this.currentIndex;  //double check these, pointers may be invalid
         newSequence.items = this.items; //I can set this directly equal to the number right
-        for (int i =0; i < this.getCapacity(); i++){
+        for (int i = 0; i < this.getCapacity(); i++){
             newSequence.holder[i] = this.holder[i];
         }
         return newSequence;
@@ -314,11 +338,13 @@ public class Sequence {
         }
     }
 
+
+
     /**
      * removes the current element in a sequence by shifting all elements from the current index to the left
      */
     private void remove(){
-        for(int i=this.currentIndex; i < this.size(); i++){
+        for(int i = this.currentIndex; i < this.size(); i++){
             this.holder[i] = this.holder[i+1];
         }
     }
@@ -351,20 +377,11 @@ public class Sequence {
      * capacity to store only the elements currently stored.
      */
     public void trimToSize() {
-        if(getCapacity() > this.items){
-            String[] newHolder = new String[this.items];
-            for(int i = 0; i < this.getCapacity() ; i++){
-
-            }
-            //have to use clone method?
-            //copy contents of the old sequence to new sequence, a for loop has to be used to add all elements
-
-
-                //if capacity...
-                //create new array to size of items
-                //add all old elements to new array
-                //set equal to new array
+        String[] newHolder = new String[this.size()];
+        for(int i = 0; i < this.size(); i++){
+            newHolder[i] = this.holder[i];
         }
+        this.holder = newHolder;
     }
 
 
@@ -384,7 +401,22 @@ public class Sequence {
      * @return a string representation of this sequence.
      */
     public String toString() {
+        String sequenceString = "{";
 
+        if(this.isEmpty()){
+            sequenceString += "}";
+        }
+        for(int i = 0; i < this.size(); i++){
+            String current = this.holder[i];
+            if(i == this.currentIndex){
+                current = ">" + current;
+            }
+            if(i != this.getLastIndex()){
+                current += ",";
+            }
+            sequenceString += current;
+        }
+        return sequenceString;
     }
 
     /**
@@ -402,7 +434,20 @@ public class Sequence {
      * @return true iff the other sequence is equal to this one.
      */
     public boolean equals(Sequence other) {
-
+        if(this.size() != other.size()) {
+            return false;
+        }
+        else if(this.size() == other.size()){
+            if (this.currentIndex != other.currentIndex){
+                return false;
+            }
+            for(int i=0; i<this.size(); i++){
+                if(!this.holder[i].equals(other.holder[i])){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -411,7 +456,7 @@ public class Sequence {
      * @return true if Sequence empty, else false
      */
     public boolean isEmpty() {
-        return this.size() > 0;
+        return this.size() == 0;
     }
 
 
@@ -422,8 +467,8 @@ public class Sequence {
         for(int i=0; i < this.size(); i++){
             this.holder[i] = null; //check this
         }
-        this.items = 0;
-        this.currentIndex = NO_INDEX;
+        this.clearItems();
+        this.setCurrentIndex(NO_INDEX);
     }
 
 }
