@@ -104,7 +104,7 @@ public class Sequence {
      * @param value a value to be added
      */
     private void shiftAndAdd(String value){
-        for(int i=this.size()-1; i>this.currentIndex; i--){
+        for(int i=this.size()-1; i>=this.currentIndex; i--){
             this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
         this.setIndexValue(this.currentIndex+1, value); //setting the index after current index to value to be added
@@ -295,8 +295,21 @@ public class Sequence {
      * If there is no current element, does nothing.
      */
     public void removeCurrent() {
+        if(this.isCurrent()){
+            this.remove();
+            if(this.endOfSequenceReached()){
+                this.setCurrentIndex(NO_INDEX);
+            }
+        }
+    }
 
-
+    /**
+     * removes the current element in a sequence by shifting all elements from the current index to the left
+     */
+    private void remove(){
+        for(int i=this.currentIndex; i < this.size(); i++){
+            this.holder[i] = this.holder[i+1];
+        }
     }
 
 
