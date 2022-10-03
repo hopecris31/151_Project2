@@ -1,3 +1,5 @@
+package proj2;
+
 /**
  * CS 151 Project 2
  * Oct 4, 2022
@@ -141,7 +143,7 @@ public class Sequence {
      * sets the current index to the index specified
      * @param newIndex a new current index
      */
-    private void setCurrentIndex (int newIndex){
+    public void setCurrentIndex (int newIndex){ //this was private, but can I make this public to use in unit tesing
         this.currentIndex = newIndex;
     }
 
