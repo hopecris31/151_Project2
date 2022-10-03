@@ -67,7 +67,6 @@ public class Sequence {
             int doubleCapacity = this.getCapacity()*2;
             this.ensureCapacity(doubleCapacity+1);
         }
-
     }
 
 
@@ -83,7 +82,7 @@ public class Sequence {
      *
      * @param value the string to add.
      */
-    public void addAfter(String value) { // make switch cases
+    public void addAfter(String value) { // should I make this into a switch case
         if(endOfSequenceReached()){ // is it okay to directly "access" an instance variable like this?
             int doubleCapacity = this.getCapacity()*2;
             this.ensureCapacity(doubleCapacity+1);
@@ -167,11 +166,20 @@ public class Sequence {
      */
     public String getCurrent() {
         if (isCurrent()){
-            return this.holder[this.currentIndex];
+            return getElementAtIndex(this.currentIndex); //is this an appropriate helper method
         }
         else{
             return null;
         }
+    }
+
+    /**
+     * gets the element at the specified index
+     * @param index the index of the element
+     * @return the element at the given index
+     */
+    private String getElementAtIndex(int index){
+        return this.holder[index];
     }
 
 
@@ -239,6 +247,7 @@ public class Sequence {
         return this.getCapacity() - this.items;
     }
 
+
     /**
      * Move forward in the sequence so that the current element is now
      * the next element in the sequence.
@@ -269,7 +278,7 @@ public class Sequence {
     public Sequence clone() {
         Sequence newSequence = new Sequence(this.getCapacity());
         newSequence.currentIndex = this.currentIndex;  //double check these, pointers may be invalid
-        newSequence.items = this.items;
+        newSequence.items = this.items; //I can set this directly equal to the number right
         for (int i =0; i < this.getCapacity(); i++){
             newSequence.holder[i] = this.holder[i];
         }
@@ -286,6 +295,7 @@ public class Sequence {
      * If there is no current element, does nothing.
      */
     public void removeCurrent() {
+
 
     }
 
