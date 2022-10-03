@@ -87,7 +87,7 @@ public class Sequence {
     /**
      * shifts all elements from currentIndex and after one to the right
      * adds a value in the holder in the spot of currentIndex, before previous currentIndex
-     * @param value
+     * @param value a value to be added
      */
     private void shiftIncludingCurrent(String value){
         for(int i = this.size()-1; i >= this.currentIndex; i--){
