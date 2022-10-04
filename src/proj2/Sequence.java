@@ -74,7 +74,7 @@ public class Sequence {
             this.shiftIncludingCurrent(value); //shifts elements at current and after and inserts the new value
         }
         else if(!this.isCurrent()){ //if currentIndex == -1
-            this.start(); //the current index becomes 0
+            this.currentIndex = 0; //the current index becomes 0
             this.setIndexValue(this.currentIndex, value); //the value is set to the currentIndex
         }
         else{ //default

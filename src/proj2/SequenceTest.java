@@ -62,11 +62,9 @@ public class SequenceTest {
 
     @Test //Tests addBefore; adds an element when the capacity has been reached
     public void testAddBeforeCapacityReached(){
-        String[] items = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-        Sequence sequence = makeSequence(items); //creates sequence with elements from above array
-        sequence.advance();
-        sequence.addBefore("0");
-        assertEquals("0", sequence.getCurrent()); //current element should be "0"
+        String[] items = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"};
+        Sequence sequence = makeSequence(items);
+        assertEquals("11", sequence.getCurrent()); //current element should be "10" at index 0, the most recently added element
         assertEquals(21, sequence.getCapacity()); //capacity should be 21
     }
 
