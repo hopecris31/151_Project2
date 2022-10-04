@@ -218,14 +218,6 @@ public class Sequence {
     }
 
     /**
-     * gets the currrent index of the Sequence
-     * @return the current index
-     */
-    public int getCurrentIndex(){
-        return this.currentIndex;
-    }
-
-    /**
      * Increase the sequence's capacity to be
      * at least minCapacity.  Does nothing
      * if current capacity is already >= minCapacity.
@@ -422,7 +414,7 @@ public class Sequence {
             if(i == this.currentIndex){
                 current = ">" + current;
             }
-            if(i != this.getLastIndex()){
+            if(i != this.size()-1){
                 current += ",";
             }
             sequenceString += current;
