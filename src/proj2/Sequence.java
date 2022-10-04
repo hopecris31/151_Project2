@@ -7,6 +7,8 @@ package proj2;
  *  A class that represents a sequence ADT.
  *
  *  INVARIANTS:
+ *  holds items of the same type
+ *
  *  If size>0:
  *      The contents are stored in sequence at indexes 0 through size-1
  *      If there's no current index, current = -1
@@ -14,11 +16,13 @@ package proj2;
  *      if size - 0, the items are irrelevant
  *  if 0 <= size <= holder.length
  *      currentIndex can never be greater than size
+ *      Items can be accessed via the "current" marker
+ *
  *
  *
  *  INSTANCE VARIABLES:
  *      holder -- the String array that holds the items
- *      items -- the elements that can be held in the array
+ *      items -- the number of elements currently in the Sequence
  *      currentIndex -- the current index of the holder
  */
 
@@ -65,17 +69,18 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addBefore(String value) {
-        if(this.endOfSequenceReached()){
-            doubleCapacity();
-            this.shiftIncludingCurrent(value);
+        if(this.items == this.getCapacity()){ //if at max capacity
+            doubleCapacity(); //doubles capacity
+            this.shiftIncludingCurrent(value); //shifts elements at current and after and inserts the new value
         }
         else if(!this.isCurrent()){ //if currentIndex == -1
-            this.advance(); //the current index becomes 0
+            this.start(); //the current index becomes 0
             this.setIndexValue(this.currentIndex, value); //the value is set to the currentIndex
         }
-        else{
+        else{ //default
             this.shiftIncludingCurrent(value);
         }
+        this.items++;
     }
 
     /**
@@ -87,7 +92,7 @@ public class Sequence {
     }
 
     /**
-     * shifts all elements from currentIndex and after one to the right
+     * shifts all elements from currentIndex and after one to the right (addBefore)
      * adds a value in the holder in the spot of currentIndex, before previous currentIndex
      * @param value a value to be added
      */
@@ -115,13 +120,16 @@ public class Sequence {
         if(this.endOfSequenceReached()){
             doubleCapacity();
             this.shiftExcludingCurrent(value);
+            this.items++;
         }
         else if(!this.isCurrent()){ //if there is no current index
             this.setIndexValue(this.getLastIndex(), value); //set last index to value
             this.setCurrentIndex(getLastIndex());
+            this.items++;
         }
         else{
             this.shiftExcludingCurrent(value);
+            this.items++;
         }
     }
 
@@ -143,7 +151,7 @@ public class Sequence {
      * sets the current index to the index specified
      * @param newIndex a new current index
      */
-    public void setCurrentIndex (int newIndex){ //this was private, but can I make this public to use in unit tesing
+    private void setCurrentIndex (int newIndex){ //this was private, but can I make this public to use in unit tesing
         this.currentIndex = newIndex;
     }
 
@@ -194,6 +202,7 @@ public class Sequence {
         return this.currentIndex == getLastIndex();
     }
 
+    //switch only works if you looking to switch one possible variable, used to check multiple different values (one variable, then check at least two different values a variable can take)
 
     /**
      * @return the element at the current location in the sequence, or
@@ -201,7 +210,7 @@ public class Sequence {
      */
     public String getCurrent() {
         if (isCurrent()){
-            return getElementAtIndex(this.currentIndex); //is this an appropriate helper method
+            return this.holder[this.currentIndex]; //is this an appropriate helper method
         }
         else{
             return null;
@@ -209,14 +218,12 @@ public class Sequence {
     }
 
     /**
-     * gets the element at the specified index
-     * @param index the index of the element
-     * @return the element at the given index
+     * gets the currrent index of the Sequence
+     * @return the current index
      */
-    private String getElementAtIndex(int index){
-        return this.holder[index];
+    public int getCurrentIndex(){
+        return this.currentIndex;
     }
-
 
     /**
      * Increase the sequence's capacity to be
@@ -271,6 +278,7 @@ public class Sequence {
     private void addItems(Sequence another){
         for(int i = 0; i < another.items; i++) { //for all items that are to be added
             this.addAfter(another.holder[i]);  //double check implementation of this helper
+            this.items ++;  //implement this line in addbefore and addafter
         }
     }
 
@@ -293,10 +301,12 @@ public class Sequence {
      * If there is no current element to begin with, do nothing.
      */
     public void advance() {
-        if(this.currentIndex == this.getLastIndex()){ // if the current index is at the end of the sequence
-            this.currentIndex = NO_INDEX;  //is this.getCapacity()-1 the best way to express "at the last index"
+        if(isCurrent()) {
+            if (this.currentIndex == this.size()-1) { // if the current index is at the end of the sequence
+                this.currentIndex = NO_INDEX;  //is this.getCapacity()-1 the best way to express "at the last index"
+            }
+            this.currentIndex += 1;
         }
-        this.currentIndex +=1;
     }
 
 
@@ -335,6 +345,7 @@ public class Sequence {
             if(this.endOfSequenceReached()){
                 this.setCurrentIndex(NO_INDEX);
             }
+            this.items--;
         }
     }
 
@@ -367,7 +378,7 @@ public class Sequence {
             this.setCurrentIndex(NO_INDEX);
         }
         else{
-            this.advance(); //here should i use advance method or set = 0
+            this.advance();
         }
     }
 
@@ -416,7 +427,7 @@ public class Sequence {
             }
             sequenceString += current;
         }
-        sequenceString += "(capacity = " + this.getCapacity() + ")";
+        sequenceString += " (capacity = " + this.getCapacity() + ")";
         return sequenceString;
     }
 
@@ -438,14 +449,12 @@ public class Sequence {
         if(this.size() != other.size()) {
             return false;
         }
-        else if(this.size() == other.size()){
-            if (this.currentIndex != other.currentIndex){
+        if (this.currentIndex != other.currentIndex){
+            return false;
+        }
+        for(int i=0; i<this.size(); i++){
+            if(!this.holder[i].equals(other.holder[i])){
                 return false;
-            }
-            for(int i=0; i<this.size(); i++){
-                if(!this.holder[i].equals(other.holder[i])){
-                    return false;
-                }
             }
         }
         return true;
@@ -469,7 +478,7 @@ public class Sequence {
             this.holder[i] = null; //check this
         }
         this.clearItems();
-        this.setCurrentIndex(NO_INDEX);
+        this.currentIndex = NO_INDEX;
     }
 
 }

@@ -9,10 +9,24 @@ import static org.junit.Assert.*;
 
 public class SequenceTest {
 
-    @Rule // a test will fail if it takes longer than 1/10 of a second to run
-    public Timeout timeout = Timeout.millis(100);
+    //@Rule // a test will fail if it takes longer than 1/10 of a second to run
+    //public Timeout timeout = Timeout.millis(100);
 
     String[] emptySequence = new String[] {};
+
+    /**
+     * creates a new sequence object with default constructor
+     * the last element added is the current element
+     * @param items the items to be added to the sequence
+     * @return the created sequence
+     */
+    private Sequence makeSequence(String[] items){
+        Sequence newSequence = new Sequence();
+        for (int i = 0; i < items.length; i++){
+            newSequence.addBefore(items[i]);
+        }
+        return newSequence;
+    }
 
     /**
      * creates a new sequence object
@@ -24,26 +38,36 @@ public class SequenceTest {
     private Sequence makeSequence(int capacity, String[] items){
         Sequence newSequence = new Sequence(capacity);
         for (int i = 0; i < items.length; i++){
-            newSequence.addBefore(items[i]);
+            newSequence.addBefore(items[i]);//update item count here, otherwise sequence.items = 0 after adding all elements
         }
         return newSequence;
     }
 
-    /**
-     * creates a new sequence object
-     * sets the currentIndex to the index specified
-     * @param capacity the capacity of the sequence
-     * @param items the items to be added to the sequence
-     * @param currentIndex the index to be set to current
-     * @return the created sequence
-     */
-    private Sequence makeSequence(int capacity, String[] items, int currentIndex){
-        Sequence newSequence = new Sequence(capacity);
-        for (int i = 0; i < items.length; i++){
-            newSequence.addBefore(items[i]);
-        }
-        newSequence.setCurrentIndex(currentIndex);
-        return newSequence;
+    @Test //Tests constructor, makes an empty sequence with default capacity of 10
+    public void testDefaultConstructor(){
+        Sequence sequence = new Sequence();
+        assertEquals(10, sequence.getCapacity()); //capacity should be 10
+        assertEquals(true, sequence.isEmpty()); //sequence should contain no elements
+        assertEquals(null, sequence.getCurrent()); //current index should be -1
+    }
+
+
+    @Test //Test non-default constructor, make empty sequence with capacity of 15
+    public void testNonDefaultConstructor(){
+        Sequence sequence = new Sequence(15);
+        assertEquals(15, sequence.getCapacity()); //capacity should be 10
+        assertEquals(true, sequence.isEmpty()); //sequence should contain no elements
+        assertEquals(null, sequence.getCurrent()); //current index should be -1
+    }
+
+    @Test //Tests addBefore; adds an element when the capacity has been reached
+    public void testAddBeforeCapacityReached(){
+        String[] items = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        Sequence sequence = makeSequence(items); //creates sequence with elements from above array
+        sequence.advance();
+        sequence.addBefore("0");
+        assertEquals("0", sequence.getCurrent()); //current element should be "0"
+        assertEquals(21, sequence.getCapacity()); //capacity should be 21
     }
 
 }
