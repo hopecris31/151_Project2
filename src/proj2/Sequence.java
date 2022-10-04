@@ -69,26 +69,17 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addBefore(String value) {
-        if(this.items == this.getCapacity()){ //if at max capacity
-            doubleCapacity(); //doubles capacity
-            this.shiftIncludingCurrent(value); //shifts elements at current and after and inserts the new value
-        }
-        else if(!this.isCurrent()){ //if currentIndex == -1
+        if(!this.isCurrent()){ //if currentIndex == -1
             this.currentIndex = 0; //the current index becomes 0
-            this.setIndexValue(this.currentIndex, value); //the value is set to the currentIndex
+            this.holder[currentIndex] = value; //the value is set to the currentIndex
         }
-        else{ //default
+        else{
+            this.capacityReached();
             this.shiftIncludingCurrent(value);
+            this.holder[this.currentIndex] = value; //setting the current index to value to be added
+            this.currentIndex += 1;
         }
-        this.items++;
-    }
-
-    /**
-     * increases the capacity of a sequence by expanding to twice its current capacity plus 1.
-     */
-    private void doubleCapacity(){
-        int doubleCapacity = this.getCapacity()*2;
-        this.ensureCapacity(doubleCapacity+1);
+        items++;
     }
 
     /**
@@ -100,7 +91,7 @@ public class Sequence {
         for(int i = this.size()-1; i >= this.currentIndex; i--){
             this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
         }
-        this.setIndexValue(this.currentIndex, value);
+        this.holder[this.currentIndex] = value;
     }
 
 
@@ -116,35 +107,35 @@ public class Sequence {
      *
      * @param value the string to add.
      */
-    public void addAfter(String value) { // should I make this into a switch case
-        if(this.endOfSequenceReached()){
-            doubleCapacity();
-            this.shiftExcludingCurrent(value);
-            this.items++;
-        }
-        else if(!this.isCurrent()){ //if there is no current index
-            this.setIndexValue(this.getLastIndex(), value); //set last index to value
-            this.setCurrentIndex(getLastIndex());
-            this.items++;
+    public void addAfter(String value) {
+        if(!this.isCurrent()){ //if there is no current index
+            this.currentIndex = this.size(); //set last index to value
+            this.setIndexValue(this.currentIndex, value);
         }
         else{
+            this.capacityReached();
             this.shiftExcludingCurrent(value);
-            this.items++;
+            this.holder[this.currentIndex+1] = value; //setting the current index to value to be added
+            this.currentIndex += 1;
+        }
+        items++;
+    }
+
+    private void capacityReached(){
+        if(this.size() == this.getCapacity()){
+            this.ensureCapacity((this.getCapacity()*2)+1);
         }
     }
 
     /**
      * shifts all elements after currentIndex over one to the right
      * adds a value in the holder after currentIndex
-     * sets currentIndex to the value just added
      * @param value a value to be added
      */
-    private void shiftExcludingCurrent(String value){
-        for(int i = this.size()-1; i > this.currentIndex; i--){
-            this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
+    private void shiftExcludingCurrent(String value) {
+        for (int i = this.size(); i > this.currentIndex; i--) {
+            this.holder[i] = this.holder[i-1]; //shifting elements to the right 1
         }
-        this.advance();
-        this.setIndexValue(this.currentIndex, value); //setting the current index to value to be added
     }
 
     /**
@@ -253,14 +244,14 @@ public class Sequence {
      * @param another the sequence whose contents should be added.
      */
     public void addAll(Sequence another) {
-        if(another.items <= this.remainingCapacity()){
-            this.addItems(another);
-            }
-        else if(another.items > this.remainingCapacity()){
+        int storedCurrentIndex = this.currentIndex;
+        if(this.size() + another.size() > this.getCapacity()){
             int minCapacity = this.size() + another.size();
             this.ensureCapacity(minCapacity);
-            this.addItems(another);
         }
+        this.setCurrentIndex(this.size()-1); //change currentIndex so you can use addAll to add all elements after the last index
+        this.addItems(another); //adds all elements using addAll
+        this.setCurrentIndex(storedCurrentIndex); //changes currentIndex back to what it was originally
     }
 
     /**
@@ -268,9 +259,12 @@ public class Sequence {
      * @param another the other sequence to be added to original
      */
     private void addItems(Sequence another){
-        for(int i = 0; i < another.items; i++) { //for all items that are to be added
-            this.addAfter(another.holder[i]);  //double check implementation of this helper
-            this.items ++;  //implement this line in addbefore and addafter
+        int anotherBeginIndex = 0;
+        int totalSize = another.size() + this.size();
+
+        for(int i = this.size(); i < totalSize; i++) { //for all items that are to be added
+            this.addAfter(another.holder[anotherBeginIndex]);  //double check implementation of this helper
+            anotherBeginIndex++;
         }
     }
 
@@ -294,7 +288,7 @@ public class Sequence {
      */
     public void advance() {
         if(isCurrent()) {
-            if (this.currentIndex == this.size()-1) { // if the current index is at the end of the sequence
+            if (endOfSequenceReached()) { // if the current index is at the end of the sequence
                 this.currentIndex = NO_INDEX;  //is this.getCapacity()-1 the best way to express "at the last index"
             }
             this.currentIndex += 1;
@@ -407,14 +401,19 @@ public class Sequence {
         String sequenceString = "{";
         if(!this.isEmpty()){
             for(int i = 0; i < this.size(); i++){
-                String current = this.holder[i];
-                if(i == this.currentIndex){
-                    current = ">" + current;
+                if(i == this.currentIndex) {
+                    sequenceString += ">";
+                    sequenceString += this.holder[i];
+                    if(i+1 != this.size()){
+                        sequenceString += ", ";
+                    }
                 }
-                else if(i != this.size()-1){
-                    current += ",";
+                else{
+                    sequenceString += this.holder[i];
+                    if(i+1 != this.size()){
+                        sequenceString += ", ";
+                    }
                 }
-                sequenceString += current;
             }
         }
         return sequenceString += "} (capacity = " + this.getCapacity() + ")";
