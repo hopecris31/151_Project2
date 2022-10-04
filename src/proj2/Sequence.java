@@ -69,16 +69,15 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addBefore(String value) {
+        //setting the current index to value to be added
         if(!this.isCurrent()){ //if currentIndex == -1
             this.currentIndex = 0; //the current index becomes 0
-            this.holder[currentIndex] = value; //the value is set to the currentIndex
         }
         else{
             this.capacityReached();
             this.shiftIncludingCurrent(value);
-            this.holder[this.currentIndex] = value; //setting the current index to value to be added
-            this.currentIndex += 1;
         }
+        this.holder[currentIndex] = value; //the value is set to the currentIndex
         items++;
     }
 
@@ -166,7 +165,7 @@ public class Sequence {
      * @return true if and only if the sequence has a current element.
      */
     public boolean isCurrent() {
-        return this.currentIndex != NO_INDEX; //double check this
+        return this.currentIndex > NO_INDEX && this.currentIndex < this.size();
     }
 
 
@@ -364,7 +363,7 @@ public class Sequence {
             this.setCurrentIndex(NO_INDEX);
         }
         else{
-            this.advance();
+            this.currentIndex = 0;
         }
     }
 
