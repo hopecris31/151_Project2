@@ -405,22 +405,19 @@ public class Sequence {
      */
     public String toString() {
         String sequenceString = "{";
-
-        if(this.isEmpty()){
-            sequenceString += "}";
-        }
-        for(int i = 0; i < this.size(); i++){
-            String current = this.holder[i];
-            if(i == this.currentIndex){
-                current = ">" + current;
+        if(!this.isEmpty()){
+            for(int i = 0; i < this.size(); i++){
+                String current = this.holder[i];
+                if(i == this.currentIndex){
+                    current = ">" + current;
+                }
+                else if(i != this.size()-1){
+                    current += ",";
+                }
+                sequenceString += current;
             }
-            if(i != this.size()-1){
-                current += ",";
-            }
-            sequenceString += current;
         }
-        sequenceString += " (capacity = " + this.getCapacity() + ")";
-        return sequenceString;
+        return sequenceString += "} (capacity = " + this.getCapacity() + ")";
     }
 
     /**

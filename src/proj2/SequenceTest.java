@@ -83,10 +83,12 @@ public class SequenceTest {
     public void addBeforeEmptySequence(){
         String[] items = new String[] {};
         Sequence sequence = new Sequence();
+        System.out.println(sequence.toString());
         sequence.addBefore("1");
         assertEquals(true, sequence.isCurrent());
         assertEquals("1", sequence.getCurrent());
         assertEquals(1, sequence.size());
+        System.out.println(sequence.toString());
     }
 
 
