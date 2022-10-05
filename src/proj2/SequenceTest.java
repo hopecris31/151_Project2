@@ -35,7 +35,7 @@ public class SequenceTest {
      * @param items the items to be added to the sequence
      * @return the created sequence
      */
-    private Sequence makeSequenceAddBefore(int capacity, String[] items){
+    private Sequence makeSequence(String[] items, int capacity){
         Sequence newSequence = new Sequence(capacity);
         for (int i = 0; i < items.length; i++){
             newSequence.addBefore(items[i]);
@@ -43,13 +43,6 @@ public class SequenceTest {
         return newSequence;
     }
 
-    private Sequence makeSequenceAddAfter(int capacity, String[] items){
-        Sequence newSequence = new Sequence(capacity);
-        for (int i = 0; i < items.length; i++){
-            newSequence.addAfter(items[i]);
-        }
-        return newSequence;
-    }
 
     @Test //Tests constructor, makes an empty sequence with default capacity of 10
     public void testDefaultConstructor(){
@@ -68,57 +61,130 @@ public class SequenceTest {
         assertEquals(null, sequence.getCurrent()); //current index should be -1
     }
 
-    @Test //Tests addBefore; adds an element when the capacity has been reached
-    public void addBeforeCapacityReached(){
-        String[] items = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"};
-        Sequence sequence = new Sequence(); //creates sequence with 10 spots
-        for (int i = 0; i < items.length; i++){
-            sequence.addBefore(items[i]);//update item count here, otherwise sequence.items = 0 after adding all elements
-        }
-        assertEquals("11", sequence.getCurrent()); //current element should be "10" at index 0, the most recently added element
-        assertEquals(21, sequence.getCapacity()); //capacity should be 21
-    }
-
-    @Test //Tests addBefore; adds an element to an empty sequence
-    public void addBeforeEmptySequence(){
-        String[] items = new String[] {};
-        Sequence sequence = new Sequence();
-        System.out.println(sequence.toString());
-        sequence.addBefore("1");
-        assertEquals(true, sequence.isCurrent());
-        assertEquals("1", sequence.getCurrent());
-        assertEquals(1, sequence.size());
-        System.out.println(sequence.toString());
-    }
-
-    @Test //Tests addBefore; adds an element to a sequence with room
-    public void addBeforeSequenceWithRoom(){
-        String[] items = new String[] {"1", "2", "3"};
-        Sequence sequence = new Sequence();
-        for (int i = 0; i < items.length; i++){
-            sequence.addBefore(items[i]);//update item count here, otherwise sequence.items = 0 after adding all elements
-        }
-        System.out.println(sequence.toString());
+    @Test //Test addBefore; no current element(added to beginning, new currIndex)
+    public void addBeforeNoCurrent(){
+        String[] items = new String[] {"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
         sequence.addBefore("X");
+
         assertEquals(true, sequence.isCurrent());
         assertEquals("X", sequence.getCurrent());
         assertEquals(4, sequence.size());
-        System.out.println(sequence.toString());
+        assertEquals(10, sequence.getCapacity());
     }
 
-    @Test //Tests addBefore; adds an element to a sequence with no current element
-    public void addBeforeNoCurrent(){
-        String[] items = new String[] {"1", "2", "3"};
-        Sequence sequence = new Sequence(7); //creates sequence with 10 spots
-        for (int i = 0; i < items.length; i++){
-            sequence.addBefore(items[i]);//update item count here, otherwise sequence.items = 0 after adding all elements
-        }
-        sequence.advance(); //advance 3 times to set current element = -1
-        sequence.advance();
+    @Test //Tests addBefore; capacity reached (capacity should expand)
+    public void addBeforeCapacityReached(){
+        String[] items = new String[] {"3", "2", "1"};
+        Sequence sequence = makeSequence(items, 3);
+        sequence.addBefore("X");
+
+        assertEquals(true, sequence.isCurrent());
+        assertEquals("X", sequence.getCurrent());
+        assertEquals(4, sequence.size());
+        assertEquals(7, sequence.getCapacity());
+    }
+
+    @Test //Test addBefore; add an element with enough capacity
+    public void addBeforeEnoughCapacity() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items, 4);
         sequence.advance();
         sequence.addBefore("X");
+
+        assertEquals(true, sequence.isCurrent());
         assertEquals("X", sequence.getCurrent());
-        System.out.println(sequence.toString());
+        assertEquals(4, sequence.size());
+        assertEquals(4, sequence.getCapacity());
+    }
+
+    @Test //Tests addBefore; adds an element to an empty sequence
+    public void addBeforeEmpty() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+        sequence.addBefore("X");
+
+        assertEquals(true, sequence.isCurrent());
+        assertEquals("X", sequence.getCurrent());
+        assertEquals(1, sequence.size());
+        assertEquals(10, sequence.getCapacity());
+    }
+
+    @Test //Tests addAfter; adds an element when there is no current element (adds to end of sequence)
+    public void addAfterNoCurrent() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+        sequence.addBefore("X");
+
+        assertEquals(true, sequence.isCurrent());
+        assertEquals("X", sequence.getCurrent());
+        assertEquals(1, sequence.size());
+        assertEquals(10, sequence.getCapacity());
+    }
+
+    @Test //Tests addAfter; adds an element when the capacity is reached
+    public void addAfterCapacityReached() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items, 3);
+        sequence.addBefore("X");
+
+        assertEquals(true, sequence.isCurrent());
+        assertEquals("X", sequence.getCurrent());
+        assertEquals(4, sequence.size());
+        assertEquals(7, sequence.getCapacity());
+    }
+
+    @Test //Tests addAfter; adds an element when there is enough capacity
+    public void addAfterEnoughCapacity() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.addBefore("X");
+
+        assertEquals(true, sequence.isCurrent());
+        assertEquals("X", sequence.getCurrent());
+        assertEquals(4, sequence.size());
+        assertEquals(10, sequence.getCapacity());
+    }
+
+    @Test //Tests isCurrent; tests on an empty sequence with no current
+    public void isCurrentNoCurrent() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        assertEquals(false, sequence.isCurrent());
+    }
+
+    @Test //Tests isCurrent; sequence has items with current
+    public void isCurrentWithCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.advance();
+
+        assertEquals(true, sequence.isCurrent());
+    }
+
+    @Test //Tests getCapacity;
+    public void getCapacity() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items, 3);
+
+        assertEquals(3, sequence.getCapacity());
+    }
+
+    @Test //Tests getCurrent; empty sequence with no current
+    public void getCurrentNoCurrent() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        assertEquals(null, sequence.getCurrent());
+    }
+
+    @Test //Tests getCurrent; sequence with current
+    public void getCurrentWithCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+
+        assertEquals("1", sequence.getCurrent());
     }
 
     @Test //Tests addAll; add all when there is not enough space so capacity has to be increased

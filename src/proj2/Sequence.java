@@ -72,7 +72,7 @@ public class Sequence {
             this.capacityReached();
         }
         this.shiftIncludingCurrent(value);
-        this.setIndexValue(currentIndex, value);
+        this.setIndexValue(this.currentIndex, value);
         items++;
     }
 
@@ -85,7 +85,7 @@ public class Sequence {
         for(int i = this.size()-1; i >= this.currentIndex; i--){
             this.holder[i+1] = this.holder[i];
         }
-        this.holder[this.currentIndex] = value;
+        this.setIndexValue(this.currentIndex, value);
     }
 
 
@@ -103,13 +103,13 @@ public class Sequence {
      */
     public void addAfter(String value) {
         if(!this.isCurrent()){
-            this.currentIndex = this.size();
+            this.setCurrentIndex(this.size());
             this.setIndexValue(this.currentIndex, value);
         }
         else{
             this.capacityReached();
             this.shiftExcludingCurrent(value);
-            this.holder[this.currentIndex+1] = value; //setting the current index to value to be added
+            this.setIndexValue(this.currentIndex+1, value);
             this.currentIndex ++;
         }
         items++;
@@ -184,7 +184,6 @@ public class Sequence {
     }
 
     /**
-     *
      * @return True if the end of the sequence has been reached, False if not
      */
     private boolean endOfSequenceReached(){
@@ -241,18 +240,15 @@ public class Sequence {
      * @param another the sequence whose contents should be added.
      */
     public void addAll(Sequence another) {
-        int storedCurrentIndex;
+        int storedCurrentIndex = this.currentIndex;
         if(!isCurrent()){
             storedCurrentIndex = NO_INDEX;
-        }
-        else{
-            storedCurrentIndex = this.currentIndex;
         }
         int totalItems = this.size() + another.size();
         if(totalItems > this.getCapacity()){
             this.ensureCapacity(totalItems);
         }
-        this.setCurrentIndex(this.size()-1);
+        this.setCurrentIndex(this.size()-1); //temporarily setting currentIndex to last for addItems to work correctly
         this.addItems(another);
         this.setCurrentIndex(storedCurrentIndex); //changes currentIndex back to what it was originally
     }
@@ -262,21 +258,13 @@ public class Sequence {
      * @param another the other sequence to be added to original
      */
     private void addItems(Sequence another){
-        int anotherBeginIndex = 0;
+        int anotherIndex = 0;
         int totalSize = another.size() + this.size();
 
         for(int i = this.size(); i < totalSize; i++) {
-            this.addAfter(another.holder[anotherBeginIndex]);
-            anotherBeginIndex++;
+            this.addAfter(another.holder[anotherIndex]);
+            anotherIndex++;
         }
-    }
-
-    /**
-     * gets the remaining capacity in a Sequence.
-     * @return the number of remaining spaces in the Sequence.
-     */
-    private int remainingCapacity(){
-        return this.getCapacity() - this.items;
     }
 
 
@@ -291,7 +279,7 @@ public class Sequence {
      */
     public void advance() {
         if(isCurrent()) {
-            if (endOfSequenceReached()) { // if the current index is at the end of the sequence
+            if (this.currentIndex == size()-1) { // if the current index is at the end of the sequence
                 this.setCurrentIndex(NO_INDEX);  //is this.getCapacity()-1 the best way to express "at the last index"
             }
             this.setCurrentIndex(+1);
@@ -468,8 +456,8 @@ public class Sequence {
         for(int i=0; i < this.size(); i++){
             this.holder[i] = null;
         }
-        this.items = 0;
-        this.currentIndex = NO_INDEX;
+        this.setCurrentIndex(NO_INDEX);
+        this.clearItems();
     }
 
 }
