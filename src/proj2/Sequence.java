@@ -1,13 +1,13 @@
 package proj2;
 
 /**
+ * Hope Crisafi
  * CS 151 Project 2
  * Oct 4, 2022
  *
- *  A class that represents a sequence ADT.
+ *  A class that represents a sequence ADT. Holds items of the same type.
  *
  *  INVARIANTS:
- *  holds items of the same type
  *
  *  If size>0:
  *      The contents are stored in sequence at indexes 0 through size-1
@@ -17,8 +17,6 @@ package proj2;
  *  if 0 <= size <= holder.length
  *      currentIndex can never be greater than size
  *      Items can be accessed via the "current" marker
- *
- *
  *
  *  INSTANCE VARIABLES:
  *      holder -- the String array that holds the items
@@ -41,8 +39,6 @@ public class Sequence {
          this.currentIndex = NO_INDEX;
          this.items = 0;
     }
-
-    //make new array, copy all elements to array, then set this.holder = new array
 
     /**
      * Creates a new sequence. (non-default constructor)
@@ -69,16 +65,14 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addBefore(String value) {
-        //setting the current index to value to be added
-        if(!this.isCurrent()){ //if currentIndex == -1
-            this.currentIndex = 0; //the current index becomes 0
+        if(!this.isCurrent()){
+            this.setCurrentIndex(0);
         }
         else{
             this.capacityReached();
         }
         this.shiftIncludingCurrent(value);
-        this.holder[currentIndex] = value;
-        //the value is set to the currentIndex
+        this.setIndexValue(currentIndex, value);
         items++;
     }
 
@@ -89,7 +83,7 @@ public class Sequence {
      */
     private void shiftIncludingCurrent(String value){
         for(int i = this.size()-1; i >= this.currentIndex; i--){
-            this.holder[i+1] = this.holder[i]; //shifting elements to the right 1
+            this.holder[i+1] = this.holder[i];
         }
         this.holder[this.currentIndex] = value;
     }
@@ -108,19 +102,23 @@ public class Sequence {
      * @param value the string to add.
      */
     public void addAfter(String value) {
-        if(!this.isCurrent()){ //if there is no current index
-            this.currentIndex = this.size(); //set last index to value
+        if(!this.isCurrent()){
+            this.currentIndex = this.size();
             this.setIndexValue(this.currentIndex, value);
         }
         else{
             this.capacityReached();
             this.shiftExcludingCurrent(value);
             this.holder[this.currentIndex+1] = value; //setting the current index to value to be added
-            this.currentIndex += 1;
+            this.currentIndex ++;
         }
         items++;
     }
 
+    /**
+     * checks if the items in the sequence have reached max capacity
+     * if max capacity is reached, capacity is set do double its current plus one
+     */
     private void capacityReached(){
         if(this.size() == this.getCapacity()){
             this.ensureCapacity((this.getCapacity()*2)+1);
@@ -142,7 +140,7 @@ public class Sequence {
      * sets the current index to the index specified
      * @param newIndex a new current index
      */
-    private void setCurrentIndex (int newIndex){ //this was private, but can I make this public to use in unit tesing
+    private void setCurrentIndex (int newIndex){
         this.currentIndex = newIndex;
     }
 
@@ -217,11 +215,10 @@ public class Sequence {
      * should now have.
      */
     public void ensureCapacity(int minCapacity) {
-        //make new array, copy all elements to array, then set this.holder = new array
         if(this.getCapacity() < minCapacity){
             String[] newHolder = new String[minCapacity];
-            for(int i = 0; i < this.getCapacity(); i++){ //check the i< condition is correct
-                newHolder[i] = this.holder[i]; // use helper method to set index??
+            for(int i = 0; i < this.getCapacity(); i++){
+                newHolder[i] = this.holder[i];
             }
             this.holder = newHolder;
         }
@@ -251,13 +248,13 @@ public class Sequence {
         else{
             storedCurrentIndex = this.currentIndex;
         }
-        if(this.size() + another.size() > this.getCapacity()){
-            int minCapacity = this.size() + another.size();
-            this.ensureCapacity(minCapacity);
+        int totalItems = this.size() + another.size();
+        if(totalItems > this.getCapacity()){
+            this.ensureCapacity(totalItems);
         }
-        this.currentIndex = this.size()-1; //change currentIndex so you can use addAll to add all elements after the last index
-        this.addItems(another); //adds all elements using addAll
-        this.currentIndex = storedCurrentIndex; //changes currentIndex back to what it was originally
+        this.setCurrentIndex(this.size()-1);
+        this.addItems(another);
+        this.setCurrentIndex(storedCurrentIndex); //changes currentIndex back to what it was originally
     }
 
     /**
@@ -268,8 +265,8 @@ public class Sequence {
         int anotherBeginIndex = 0;
         int totalSize = another.size() + this.size();
 
-        for(int i = this.size(); i < totalSize; i++) { //for all items that are to be added
-            this.addAfter(another.holder[anotherBeginIndex]);  //double check implementation of this helper
+        for(int i = this.size(); i < totalSize; i++) {
+            this.addAfter(another.holder[anotherBeginIndex]);
             anotherBeginIndex++;
         }
     }
@@ -295,9 +292,9 @@ public class Sequence {
     public void advance() {
         if(isCurrent()) {
             if (endOfSequenceReached()) { // if the current index is at the end of the sequence
-                this.currentIndex = NO_INDEX;  //is this.getCapacity()-1 the best way to express "at the last index"
+                this.setCurrentIndex(NO_INDEX);  //is this.getCapacity()-1 the best way to express "at the last index"
             }
-            this.currentIndex += 1;
+            this.setCurrentIndex(+1);
         }
     }
 
@@ -314,8 +311,8 @@ public class Sequence {
      */
     public Sequence clone() {
         Sequence newSequence = new Sequence(this.getCapacity());
-        newSequence.currentIndex = this.currentIndex;  //double check these, pointers may be invalid
-        newSequence.items = this.items; //I can set this directly equal to the number right
+        newSequence.currentIndex = this.currentIndex;
+        newSequence.items = this.items;
         for (int i = 0; i < this.getCapacity(); i++){
             newSequence.holder[i] = this.holder[i];
         }
@@ -332,7 +329,7 @@ public class Sequence {
      * If there is no current element, does nothing.
      */
     public void removeCurrent() {
-        if(this.isCurrent()){ //as remove() shifts elements down, the next element automatically becomes current without having to set it
+        if(this.isCurrent()){
             this.remove();
             if(this.endOfSequenceReached()){
                 this.setCurrentIndex(NO_INDEX);
@@ -370,7 +367,7 @@ public class Sequence {
             this.setCurrentIndex(NO_INDEX);
         }
         else{
-            this.currentIndex = 0;
+            this.setCurrentIndex(0);
         }
     }
 
@@ -469,7 +466,7 @@ public class Sequence {
      */
     public void clear() {
         for(int i=0; i < this.size(); i++){
-            this.holder[i] = null; //check this
+            this.holder[i] = null;
         }
         this.items = 0;
         this.currentIndex = NO_INDEX;

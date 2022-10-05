@@ -125,6 +125,7 @@ public class SequenceTest {
     public void adAllIncreaseCapacity(){
         String[] items1 = new String[] {"1", "2"};
         String[] items2 = new String[] {"C", "B", "A"};
+        Sequence seq = new Sequence(10);
         Sequence sequence1 = new Sequence(2); //creates sequence with 10 spots
         Sequence sequence2 = new Sequence(3);
         for (int i = 0; i < items1.length; i++){
