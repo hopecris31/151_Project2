@@ -51,7 +51,6 @@ public class Sequence {
         this.items = 0;
     }
 
-
     /**
      * Adds a string to the sequence in the location before the
      * current element. If the sequence has no current element, the
@@ -75,19 +74,6 @@ public class Sequence {
         this.setIndexValue(this.currentIndex, value);
         items++;
     }
-
-    /**
-     * shifts all elements from currentIndex and after one to the right (addBefore)
-     * adds a value in the holder in the spot of currentIndex, before previous currentIndex
-     * @param value a value to be added
-     */
-    private void shiftIncludingCurrent(String value){
-        for(int i = this.size()-1; i >= this.currentIndex; i--){
-            this.holder[i+1] = this.holder[i];
-        }
-        this.setIndexValue(this.currentIndex, value);
-    }
-
 
     /**
      * Adds a string to the sequence in the location after the current
@@ -116,57 +102,11 @@ public class Sequence {
     }
 
     /**
-     * checks if the items in the sequence have reached max capacity
-     * if max capacity is reached, capacity is set do double its current plus one
-     */
-    private void capacityReached(){
-        if(this.size() == this.getCapacity()){
-            this.ensureCapacity((this.getCapacity()*2)+1);
-        }
-    }
-
-    /**
-     * shifts all elements after currentIndex over one to the right
-     * adds a value in the holder after currentIndex
-     * @param value a value to be added
-     */
-    private void shiftExcludingCurrent(String value) {
-        for (int i = this.size(); i > this.currentIndex; i--) {
-            this.holder[i] = this.holder[i-1]; //shifting elements to the right 1
-        }
-    }
-
-    /**
-     * sets the current index to the index specified
-     * @param newIndex a new current index
-     */
-    private void setCurrentIndex (int newIndex){
-        this.currentIndex = newIndex;
-    }
-
-    /**
-     *Sets a value to a specified index
-     * @param index index to be set
-     * @param value value to take place of the index
-     */
-    private void setIndexValue(int index, String value){
-        this.holder[index] = value;
-    }
-
-    /**
-     * sets the number of items in the sequence to 0
-     */
-    private void clearItems(){
-        this.items = 0;
-    }
-
-    /**
      * @return true if and only if the sequence has a current element.
      */
     public boolean isCurrent() {
         return this.currentIndex > NO_INDEX && this.currentIndex < this.size();
     }
-
 
     /**
      * @return the capacity of the sequence.
@@ -174,23 +114,6 @@ public class Sequence {
     public int getCapacity() {
         return this.holder.length;
     }
-
-    /**
-     * gets the last index in a seqence
-     * @return the last index of a sequence
-     */
-    private int getLastIndex(){
-        return getCapacity()-1;
-    }
-
-    /**
-     * @return True if the end of the sequence has been reached, False if not
-     */
-    private boolean endOfSequenceReached(){
-        return this.currentIndex == getLastIndex();
-    }
-
-    //switch only works if you looking to switch one possible variable, used to check multiple different values (one variable, then check at least two different values a variable can take)
 
     /**
      * @return the element at the current location in the sequence, or
@@ -223,7 +146,6 @@ public class Sequence {
         }
     }
 
-
     /**
      * Places the contents of another sequence at the end of this sequence.
      *
@@ -254,21 +176,6 @@ public class Sequence {
     }
 
     /**
-     * adds items from another Sequence to this sequence.
-     * @param another the other sequence to be added to original
-     */
-    private void addItems(Sequence another){
-        int anotherIndex = 0;
-        int totalSize = another.size() + this.size();
-
-        for(int i = this.size(); i < totalSize; i++) {
-            this.addAfter(another.holder[anotherIndex]);
-            anotherIndex++;
-        }
-    }
-
-
-    /**
      * Move forward in the sequence so that the current element is now
      * the next element in the sequence.
      *
@@ -285,7 +192,6 @@ public class Sequence {
             this.currentIndex +=1;
         }
     }
-
 
     /**
      * Make a copy of this sequence.  Subsequence changes to the copy
@@ -307,7 +213,6 @@ public class Sequence {
         return newSequence;
     }
 
-
     /**
      * Remove the current element from this sequence.  The following
      * element, if there was one, becomes the current element.  If
@@ -326,25 +231,12 @@ public class Sequence {
         }
     }
 
-
-
-    /**
-     * removes the current element in a sequence by shifting all elements from the current index to the left
-     */
-    private void remove(){
-        for(int i = this.currentIndex; i < this.size(); i++){
-            this.holder[i] = this.holder[i+1];
-        }
-    }
-
-
     /**
      * @return the number of elements stored in the sequence.
      */
     public int size() {
         return this.items;
     }
-
 
     /**
      * Sets the current element to the start of the sequence.  If the
@@ -371,7 +263,6 @@ public class Sequence {
         }
         this.holder = newHolder;
     }
-
 
     /**
      * Produce a string representation of this sequence.  The current
@@ -448,7 +339,6 @@ public class Sequence {
         return this.size() == 0;
     }
 
-
     /**
      *  empty the sequence.  There should be no current element.
      */
@@ -458,6 +348,108 @@ public class Sequence {
         }
         this.setCurrentIndex(NO_INDEX);
         this.clearItems();
+    }
+
+
+    /** ------------------------------
+     *      PRIVATE HELPER METHODS
+     * _______________________________
+     */
+
+
+    /**
+     * shifts all elements from currentIndex and after one to the right (addBefore)
+     * adds a value in the holder in the spot of currentIndex, before previous currentIndex
+     * @param value a value to be added
+     */
+    private void shiftIncludingCurrent(String value){
+        for(int i = this.size()-1; i >= this.currentIndex; i--){
+            this.holder[i+1] = this.holder[i];
+        }
+        this.setIndexValue(this.currentIndex, value);
+    }
+
+    /**
+     * checks if the items in the sequence have reached max capacity
+     * if max capacity is reached, capacity is set do double its current plus one
+     */
+    private void capacityReached(){
+        if(this.size() == this.getCapacity()){
+            this.ensureCapacity((this.getCapacity()*2)+1);
+        }
+    }
+
+    /**
+     * shifts all elements after currentIndex over one to the right
+     * adds a value in the holder after currentIndex
+     * @param value a value to be added
+     */
+    private void shiftExcludingCurrent(String value) {
+        for (int i = this.size(); i > this.currentIndex; i--) {
+            this.holder[i] = this.holder[i-1]; //shifting elements to the right 1
+        }
+    }
+
+    /**
+     * sets the current index to the index specified
+     * @param newIndex a new current index
+     */
+    private void setCurrentIndex (int newIndex){
+        this.currentIndex = newIndex;
+    }
+
+    /**
+     *Sets a value to a specified index
+     * @param index index to be set
+     * @param value value to take place of the index
+     */
+    private void setIndexValue(int index, String value){
+        this.holder[index] = value;
+    }
+
+    /**
+     * sets the number of items in the sequence to 0
+     */
+    private void clearItems(){
+        this.items = 0;
+    }
+
+    /**
+     * gets the last index in a seqence
+     * @return the last index of a sequence
+     */
+    private int getLastIndex(){
+        return getCapacity()-1;
+    }
+
+    /**
+     * @return True if the end of the sequence has been reached, False if not
+     */
+    private boolean endOfSequenceReached(){
+        return this.currentIndex == getLastIndex();
+    }
+
+    /**
+     * adds items from another Sequence to this sequence.
+     * @param another the other sequence to be added to original
+     */
+    private void addItems(Sequence another){
+        int anotherIndex = 0;
+        int totalSize = another.size() + this.size();
+
+        for(int i = this.size(); i < totalSize; i++) {
+            this.addAfter(another.holder[anotherIndex]);
+            anotherIndex++;
+        }
+    }
+
+    /**
+     * removes the current element in a sequence by shifting all elements from the current index to the left
+     */
+    private void remove(){
+        for(int i = this.currentIndex; i < this.size(); i++){
+            this.holder[i] = this.holder[i+1];
+        }
     }
 
 }

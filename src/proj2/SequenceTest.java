@@ -1,7 +1,7 @@
 package proj2;
 
 /**
- * JUnit test class.  Use these tests as models for your own.
+ * JUnit test class.  Tests the constructors and public methods for the Sequence class.
  */
 import org.junit.*;
 import org.junit.rules.Timeout;
@@ -11,8 +11,6 @@ public class SequenceTest {
 
     @Rule // a test will fail if it takes longer than 1/10 of a second to run
     public Timeout timeout = Timeout.millis(100);
-
-    String[] emptySequence = new String[] {};
 
     /**
      * creates a new sequence object with default constructor
@@ -268,10 +266,8 @@ public class SequenceTest {
         String[] items = new String[]{"3", "2", "1"};
         Sequence sequence = makeSequence(items);
 
-        System.out.println(sequence);
         sequence.advance(); //advance to get current = 2
         sequence.advance();
-        System.out.println(sequence);
 
         assertEquals("3", sequence.getCurrent());
     }
@@ -423,4 +419,145 @@ public class SequenceTest {
         assertEquals(0, sequence.getCapacity());
         assertEquals(0, sequence.size());
     }
+
+    @Test //Tests toString on an empty sequence
+    public void toStringEmptySequence() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        assertEquals("{} (capacity = 10)", sequence.toString());
+    }
+
+    @Test //Tests toString on a sequence with elements but no current element
+    public void toStringWithElementsNoCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.advance();
+        sequence.advance();
+        sequence.advance();
+
+        assertEquals("{1, 2, 3} (capacity = 10)", sequence.toString());
+    }
+
+    @Test //Tests toString on a sequence with elements and a current element
+    public void toStringWithElementsAndCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.start();
+
+        assertEquals("{>1, 2, 3} (capacity = 10)", sequence.toString());
+    }
+
+    @Test //Tests equals; two of the exact same sequences
+    public void equalsExactSame() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        Sequence sequence1 = makeSequence(items1);
+        sequence1.start();
+        String[] items2 = new String[]{"3", "2", "1"};
+        Sequence sequence2 = makeSequence(items2);
+        sequence2.start();
+
+        assertTrue(sequence1.equals(sequence2));
+    }
+
+    @Test //Tests equals; two of the exact same sequences
+    public void equalsDifferentCurrent() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        Sequence sequence1 = makeSequence(items1);
+        sequence1.start();
+        sequence1.advance();
+        String[] items2 = new String[]{"3", "2", "1"};
+        Sequence sequence2 = makeSequence(items2);
+        sequence2.start();
+
+        assertFalse(sequence1.equals(sequence2));
+    }
+
+    @Test //Tests equals; sequences have different size
+    public void equalsDifferentSize() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        Sequence sequence1 = makeSequence(items1);
+        sequence1.start();
+        String[] items2 = new String[]{"4", "3", "2", "1"};
+        Sequence sequence2 = makeSequence(items2);
+        sequence2.start();
+
+        assertFalse(sequence1.equals(sequence2));
+    }
+
+    @Test //Tests equals; sequences have different capacity
+    public void equalsCapacity() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        Sequence sequence1 = makeSequence(items1);
+        sequence1.start();
+        String[] items2 = new String[]{"3", "2", "1"};
+        Sequence sequence2 = makeSequence(items2, 5);
+        sequence2.start();
+
+        assertTrue(sequence1.equals(sequence2));
+    }
+
+    @Test //Tests equals; sequences have one differing item
+    public void equalsDifferentItem() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        Sequence sequence1 = makeSequence(items1);
+        sequence1.start();
+        String[] items2 = new String[]{"X", "2", "1"};
+        Sequence sequence2 = makeSequence(items2);
+        sequence2.start();
+
+        assertFalse(sequence1.equals(sequence2));
+    }
+
+    @Test //Tests isEmpty; sequence has items
+    public void isEmptyWithItems() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+
+        assertFalse(sequence.isEmpty());
+    }
+
+    @Test //Tests isEmpty; sequence has no items
+    public void isEmptyNoItems() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        assertTrue(sequence.isEmpty());
+    }
+
+    @Test //Tests clear; sequence has no items
+    public void clearEmptySequence() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        sequence.clear();
+
+        assertEquals(0, sequence.size());
+        assertNull(sequence.getCurrent());
+    }
+
+    @Test //Tests clear; sequence has items and a current element
+    public void clearSequenceWithItemsAndCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.start();
+        sequence.advance();
+
+        sequence.clear();
+
+        assertEquals(0, sequence.size());
+        assertNull(sequence.getCurrent());
+    }
+
+    @Test //Tests clear; sequence has items but no current element
+    public void clearSequenceWithItemsAndNoCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+
+        sequence.clear();
+
+        assertEquals(0, sequence.size());
+        assertNull(sequence.getCurrent());
+    }
+
 }
