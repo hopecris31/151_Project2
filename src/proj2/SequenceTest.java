@@ -356,6 +356,17 @@ public class SequenceTest {
         assertEquals(2, sequence.size());
     }
 
+    @Test //Tests removeCurrent; called on an empty sequence
+    public void removeCurrentEmptySequence() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        sequence.removeCurrent();
+
+        assertNull(sequence.getCurrent());
+        assertEquals(0, sequence.size());
+    }
+
     @Test //Tests size; called on an empty sequence
     public void sizeEmptySequence() {
         String[] items = new String[]{};

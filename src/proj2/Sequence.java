@@ -6,6 +6,7 @@ package proj2;
  * Oct 4, 2022
  *
  *  A class that represents a sequence ADT. Holds items of the same type.
+ *  Items in sequence are accessed via a "current" marker, and not by index
  *
  *  INVARIANTS:
  *
@@ -17,11 +18,16 @@ package proj2;
  *  if 0 <= size <= holder.length
  *      currentIndex can never be greater than size
  *      Items can be accessed via the "current" marker
+ *      If items are added to a full sequence, the capacity expands to accommodate the added item
  *
  *  INSTANCE VARIABLES:
  *      holder -- the String array that holds the items
  *      items -- the number of elements currently in the Sequence
  *      currentIndex -- the current index of the holder
+ *
+ *      I affirm that I have carried out the attached academic endeavors with full
+ *      academic honesty, in accordance with the Union College Honor Code and the course
+ *      syllabus.
  */
 
 public class Sequence {
