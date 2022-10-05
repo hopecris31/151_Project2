@@ -187,23 +187,67 @@ public class SequenceTest {
         assertEquals("1", sequence.getCurrent());
     }
 
-    @Test //Tests addAll; add all when there is not enough space so capacity has to be increased
-    public void adAllIncreaseCapacity(){
-        String[] items1 = new String[] {"1", "2"};
-        String[] items2 = new String[] {"C", "B", "A"};
-        Sequence seq = new Sequence(10);
-        Sequence sequence1 = new Sequence(2); //creates sequence with 10 spots
-        Sequence sequence2 = new Sequence(3);
-        for (int i = 0; i < items1.length; i++){
-            sequence1.addBefore(items1[i]);//update item count here, otherwise sequence.items = 0 after adding all elements
-        }
-        for (int i = 0; i < items2.length; i++){
-            sequence2.addBefore(items2[i]);//update item count here, otherwise sequence.items = 0 after adding all elements
-        }
-        sequence1.addAll(sequence2);
-        System.out.println(sequence1.toString());
+    @Test //Tests ensureCapacity; not enough space so it has to expand sequence
+    public void ensureCapacityNotEnoughSpace() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items, 3);
+        sequence.ensureCapacity(5);
+
+        assertEquals(5, sequence.getCapacity());
+        assertEquals(3, sequence.size());
     }
 
+    @Test //Tests ensureCapacity; there is enough space, so ensureCapacity should do nothing
+    public void ensureCapacityEnoughSpace() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items, 3);
+        sequence.ensureCapacity(2);
 
+        assertEquals(3, sequence.getCapacity());
+        assertEquals(3, sequence.size());
+    }
 
+    @Test //Tests addAll; if there is enough space for items to be added
+    public void addAllEnoughSpace() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        String[] items2 = new String[]{"C", "B", "A"};
+        Sequence sequence1 = makeSequence(items1);
+        Sequence sequence2 = makeSequence(items2);
+        sequence1.start(); //currentIndex should be 1
+
+        sequence1.addAll(sequence2);
+
+        assertEquals(6, sequence1.size());
+        assertEquals(10, sequence1.getCapacity());
+        assertEquals("1", sequence1.getCurrent());
+    }
+
+    @Test //Tests addAll; if there is not enough space for items to be added, capacity increases
+    public void addAllNotEnoughSpace() {
+        String[] items1 = new String[]{"3", "2", "1"};
+        String[] items2 = new String[]{"C", "B", "A"};
+        Sequence sequence1 = makeSequence(items1, 3);
+        Sequence sequence2 = makeSequence(items2);
+        sequence1.start(); //currentIndex should be 1
+
+        sequence1.addAll(sequence2);
+
+        assertEquals(6, sequence1.size());
+        assertEquals(6, sequence1.getCapacity());
+        assertEquals("1", sequence1.getCurrent());
+    }
+
+    @Test //Tests addAll; if there is enough space for items to be added
+    public void addAllNoCurrentIndex() {
+        String[] items1 = new String[]{};
+        String[] items2 = new String[]{"C", "B", "A"};
+        Sequence sequence1 = makeSequence(items1);
+        Sequence sequence2 = makeSequence(items2);
+
+        sequence1.addAll(sequence2);
+
+        assertEquals(3, sequence1.size());
+        assertEquals(10, sequence1.getCapacity());
+        assertEquals(null, sequence1.getCurrent());
+    }
 }
