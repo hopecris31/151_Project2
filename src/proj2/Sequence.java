@@ -75,9 +75,10 @@ public class Sequence {
         }
         else{
             this.capacityReached();
-            this.shiftIncludingCurrent(value);
         }
-        this.holder[currentIndex] = value; //the value is set to the currentIndex
+        this.shiftIncludingCurrent(value);
+        this.holder[currentIndex] = value;
+        //the value is set to the currentIndex
         items++;
     }
 
@@ -243,14 +244,20 @@ public class Sequence {
      * @param another the sequence whose contents should be added.
      */
     public void addAll(Sequence another) {
-        int storedCurrentIndex = this.currentIndex;
+        int storedCurrentIndex;
+        if(!isCurrent()){
+            storedCurrentIndex = NO_INDEX;
+        }
+        else{
+            storedCurrentIndex = this.currentIndex;
+        }
         if(this.size() + another.size() > this.getCapacity()){
             int minCapacity = this.size() + another.size();
             this.ensureCapacity(minCapacity);
         }
-        this.setCurrentIndex(this.size()-1); //change currentIndex so you can use addAll to add all elements after the last index
+        this.currentIndex = this.size()-1; //change currentIndex so you can use addAll to add all elements after the last index
         this.addItems(another); //adds all elements using addAll
-        this.setCurrentIndex(storedCurrentIndex); //changes currentIndex back to what it was originally
+        this.currentIndex = storedCurrentIndex; //changes currentIndex back to what it was originally
     }
 
     /**
@@ -464,7 +471,7 @@ public class Sequence {
         for(int i=0; i < this.size(); i++){
             this.holder[i] = null; //check this
         }
-        this.clearItems();
+        this.items = 0;
         this.currentIndex = NO_INDEX;
     }
 
