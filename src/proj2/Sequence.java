@@ -279,10 +279,10 @@ public class Sequence {
      */
     public void advance() {
         if(isCurrent()) {
-            if (this.currentIndex == size()-1) { // if the current index is at the end of the sequence
+            if (endOfSequenceReached()) { // if the current index is at the end of the sequence
                 this.setCurrentIndex(NO_INDEX);  //is this.getCapacity()-1 the best way to express "at the last index"
             }
-            this.setCurrentIndex(+1);
+            this.currentIndex +=1;
         }
     }
 

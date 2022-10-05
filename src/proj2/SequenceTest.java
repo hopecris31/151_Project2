@@ -250,4 +250,87 @@ public class SequenceTest {
         assertEquals(10, sequence1.getCapacity());
         assertEquals(null, sequence1.getCurrent());
     }
+
+    @Test //Tests advance; at end of size so makes current = -1
+    public void advanceAtEndOfSize() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+
+        sequence.advance(); //advance 3 times to get advance to equal no index
+        sequence.advance();
+        sequence.advance();
+
+        assertEquals(null, sequence.getCurrent());
+    }
+
+    @Test //Tests advance; there is a current index with room to advance to a next one
+    public void advanceWithCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+
+        System.out.println(sequence);
+        sequence.advance(); //advance to get current = 2
+        sequence.advance();
+        System.out.println(sequence);
+
+        assertEquals("3", sequence.getCurrent());
+    }
+
+    @Test //Tests advance; no current index
+    public void advanceNoCurrent() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        sequence.advance();
+
+        assertEquals(null, sequence.getCurrent());
+    }
+
+    @Test //Tests clone; clone empty sequence
+    public void cloneEmpty() {
+        String[] items = new String[]{};
+        Sequence sequence = makeSequence(items);
+
+        Sequence cloneSequence = sequence.clone();
+
+        assertEquals(true, sequence.equals(cloneSequence)); //tests below are to ensure clone worked in case equals is not working properly
+
+        assertEquals(null, sequence.getCurrent());
+        assertEquals(10, sequence.getCapacity());
+        assertEquals(0, sequence.size());
+        assertEquals(null, cloneSequence.getCurrent());
+        assertEquals(10, cloneSequence.getCapacity());
+        assertEquals(0, cloneSequence.size());
+    }
+
+    @Test //Tests clone; clone sequence with elements
+    public void cloneWithElements() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.advance();
+
+        Sequence cloneSequence = sequence.clone();
+
+        assertEquals(true, sequence.equals(cloneSequence)); //tests below are to ensure clone worked in case equals is not working properly
+
+        assertEquals("2", sequence.getCurrent());
+        assertEquals(10, sequence.getCapacity());
+        assertEquals(3, sequence.size());
+        assertEquals("2", cloneSequence.getCurrent());
+        assertEquals(10, cloneSequence.getCapacity());
+        assertEquals(3, cloneSequence.size());
+    }
+
+    @Test //Tests removeCurrent; removes the current element in a sequence that has a current element
+    public void removeCurrentWithCurrent() {
+        String[] items = new String[]{"3", "2", "1"};
+        Sequence sequence = makeSequence(items);
+        sequence.advance();
+
+        sequence.removeCurrent();
+
+        assertEquals("3", sequence.getCurrent());
+        assertEquals(2, sequence.size());
+    }
+
 }
