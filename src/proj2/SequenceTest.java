@@ -551,13 +551,13 @@ public class SequenceTest {
     public void clearSequenceWithItemsAndCurrent() {
         String[] items = new String[]{"3", "2", "1"};
         Sequence sequence = makeSequence(items);
-        sequence.start();
         sequence.advance();
 
         sequence.clear();
+        System.out.println(sequence);
 
         assertEquals(0, sequence.size());
-        assertNull(sequence.getCurrent());
+        assertEquals(false, sequence.isCurrent());
     }
 
     @Test //Tests clear; sequence has items but no current element

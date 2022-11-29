@@ -14,9 +14,8 @@ package proj2;
  *      The contents are stored in sequence at indexes 0 through size-1
  *      If there's no current index, current = -1
  *      the contents at Indexes >= items are irrelevant
- *      if size - 0, the items are irrelevant
- *  if 0 <= size <= holder.length
- *      currentIndex can never be greater than size
+ *      if size = 0, any items become irrelevant
+ *      currentIndex can never be greater than or equal to size
  *      Items can be accessed via the "current" marker
  *      If items are added to a full sequence, the capacity expands to accommodate the added item
  *
@@ -24,18 +23,15 @@ package proj2;
  *      holder -- the String array that holds the items
  *      items -- the number of elements currently in the Sequence
  *      currentIndex -- the current index of the holder
- *
- *      I affirm that I have carried out the attached academic endeavors with full
- *      academic honesty, in accordance with the Union College Honor Code and the course
- *      syllabus.
  */
 
 public class Sequence {
-    private final int DEFAULT_SIZE = 10;
     private String[] holder;
-    private int items; //the number of items in the holder
+    private int items;
     private int currentIndex;
+    private final int DEFAULT_SIZE = 10;
     private final int NO_INDEX = -1;
+    private final int EMPTY = 0;
 
     /**
      * Creates a new sequence with initial capacity 10.
@@ -43,7 +39,7 @@ public class Sequence {
     public Sequence() {
          this.holder = new String[DEFAULT_SIZE];
          this.currentIndex = NO_INDEX;
-         this.items = 0;
+         this.items = EMPTY;
     }
 
     /**
@@ -111,7 +107,7 @@ public class Sequence {
      * @return true if and only if the sequence has a current element.
      */
     public boolean isCurrent() {
-        return this.currentIndex > NO_INDEX && this.currentIndex < this.size();
+        return this.currentIndex > NO_INDEX;
     }
 
     /**
@@ -127,7 +123,7 @@ public class Sequence {
      */
     public String getCurrent() {
         if (isCurrent()){
-            return this.holder[this.currentIndex]; //is this an appropriate helper method
+            return this.holder[this.currentIndex];
         }
         else{
             return null;
@@ -145,7 +141,7 @@ public class Sequence {
     public void ensureCapacity(int minCapacity) {
         if(this.getCapacity() < minCapacity){
             String[] newHolder = new String[minCapacity];
-            for(int i = 0; i < this.getCapacity(); i++){
+            for(int i = 0; i < this.size(); i++){
                 newHolder[i] = this.holder[i];
             }
             this.holder = newHolder;
@@ -176,9 +172,9 @@ public class Sequence {
         if(totalItems > this.getCapacity()){
             this.ensureCapacity(totalItems);
         }
-        this.setCurrentIndex(this.size()-1); //temporarily setting currentIndex to last for addItems to work correctly
+        this.setCurrentIndex(this.size()-1);
         this.addItems(another);
-        this.setCurrentIndex(storedCurrentIndex); //changes currentIndex back to what it was originally
+        this.setCurrentIndex(storedCurrentIndex);
     }
 
     /**
@@ -192,10 +188,11 @@ public class Sequence {
      */
     public void advance() {
         if(isCurrent()) {
-            if (endOfSequenceReached()) { // if the current index is at the end of the sequence
-                this.setCurrentIndex(NO_INDEX);  //is this.getCapacity()-1 the best way to express "at the last index"
+            if (endOfSequenceReached()) {
+                this.setCurrentIndex(NO_INDEX);
             }
-            this.currentIndex +=1;
+            else{this.currentIndex +=1;
+            }
         }
     }
 
@@ -212,8 +209,8 @@ public class Sequence {
     public Sequence clone() {
         Sequence newSequence = new Sequence(this.getCapacity());
         newSequence.currentIndex = this.currentIndex;
-        newSequence.items = this.items;
-        for (int i = 0; i < this.getCapacity(); i++){
+        newSequence.items = this.size();
+        for (int i = 0; i < this.size(); i++){
             newSequence.holder[i] = this.holder[i];
         }
         return newSequence;
@@ -263,11 +260,13 @@ public class Sequence {
      * capacity to store only the elements currently stored.
      */
     public void trimToSize() {
-        String[] newHolder = new String[this.size()];
-        for(int i = 0; i < this.size(); i++){
-            newHolder[i] = this.holder[i];
+        if(this.getCapacity() != this.size()){
+            String[] newHolder = new String[this.size()];
+            for(int i = 0; i < this.size(); i++){
+                newHolder[i] = this.holder[i];
+            }
+            this.holder = newHolder;
         }
-        this.holder = newHolder;
     }
 
     /**
@@ -291,16 +290,10 @@ public class Sequence {
             for(int i = 0; i < this.size(); i++){
                 if(i == this.currentIndex) {
                     sequenceString += ">";
-                    sequenceString += this.holder[i];
-                    if(i+1 != this.size()){
-                        sequenceString += ", ";
-                    }
                 }
-                else{
-                    sequenceString += this.holder[i];
-                    if(i+1 != this.size()){
-                        sequenceString += ", ";
-                    }
+                sequenceString += this.holder[i];
+                if(i+1 != this.size()){
+                    sequenceString += ", ";
                 }
             }
         }
@@ -342,18 +335,15 @@ public class Sequence {
      * @return true if Sequence empty, else false
      */
     public boolean isEmpty() {
-        return this.size() == 0;
+        return this.size() == EMPTY;
     }
 
     /**
      *  empty the sequence.  There should be no current element.
      */
     public void clear() {
-        for(int i=0; i < this.size(); i++){
-            this.holder[i] = null;
-        }
-        this.setCurrentIndex(NO_INDEX);
-        this.clearItems();
+        this.items = EMPTY;
+        this.currentIndex = NO_INDEX;
     }
 
 
@@ -413,12 +403,6 @@ public class Sequence {
         this.holder[index] = value;
     }
 
-    /**
-     * sets the number of items in the sequence to 0
-     */
-    private void clearItems(){
-        this.items = 0;
-    }
 
     /**
      * gets the last index in a seqence
@@ -432,7 +416,7 @@ public class Sequence {
      * @return True if the end of the sequence has been reached, False if not
      */
     private boolean endOfSequenceReached(){
-        return this.currentIndex == getLastIndex();
+        return this.currentIndex == this.size()-1;
     }
 
     /**
@@ -452,9 +436,9 @@ public class Sequence {
     /**
      * removes the current element in a sequence by shifting all elements from the current index to the left
      */
-    private void remove(){
-        for(int i = this.currentIndex; i < this.size(); i++){
-            this.holder[i] = this.holder[i+1];
+    private void remove() {
+        for (int i = this.currentIndex; i < this.size(); i++) {
+            this.holder[i] = this.holder[i + 1];
         }
     }
 
